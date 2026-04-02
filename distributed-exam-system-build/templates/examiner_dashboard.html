@@ -1,0 +1,109 @@
+{% extends "base.html" %} {% block title %}Examiner Dashboard | ExamSphere{% endblock %} {% block content %}
+<section class="dashboard-head">
+  <h1>Examiner Workspace</h1>
+  <p>Create question banks, assign questions to exams, and evaluate descriptive submissions.</p>
+</section>
+
+<section class="panel">
+  <h2>Add Question</h2>
+  <form method="post" action="{{ url_for('examiner_add_question') }}" class="inline-form">
+    <input type="text" name="text" placeholder="Question text" minlength="5" required />
+    <select name="type" required>
+      <option value="mcq">MCQ</option>
+      <option value="descriptive">Descriptive</option>
+    </select>
+    <input type="number" name="marks" min="1" placeholder="Marks" required />
+    <input type="text" name="options" placeholder="MCQ options: A|B|C|D" />
+    <input type="text" name="correct_answer" placeholder="MCQ correct answer" />
+    <button class="btn btn-primary" type="submit">Add Question</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Question Bank</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Type</th>
+          <th>Marks</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for question in questions %}
+        <tr>
+          <td>{{ question.text }}</td>
+          <td>{{ question.type }}</td>
+          <td>{{ question.marks }}</td>
+          <td>
+            <form method="post" action="{{ url_for('examiner_update_question', question_id=question.id) }}" class="table-actions">
+              <input type="text" name="text" value="{{ question.text }}" minlength="5" required />
+              <input type="number" name="marks" min="1" value="{{ question.marks }}" required />
+              {% if question.type == 'mcq' %}
+              <input type="text" name="options" value="{{ question.options|join('|') }}" required />
+              <input type="text" name="correct_answer" value="{{ question.correct_answer }}" required />
+              {% endif %}
+              <button class="btn btn-secondary" type="submit">Update</button>
+            </form>
+            <form method="post" action="{{ url_for('examiner_delete_question', question_id=question.id) }}">
+              <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Assign Questions to Exams</h2>
+  {% for exam in exams %}
+  <form method="post" action="{{ url_for('examiner_assign_questions', exam_id=exam.id) }}" class="assign-form">
+    <h3>{{ exam.title }} ({{ exam.date }} {{ exam.time }})</h3>
+    <div class="checkbox-grid">
+      {% for question in questions %}
+      <label>
+        <input
+          type="checkbox"
+          name="question_ids"
+          value="{{ question.id }}"
+          {% if question.id in exam.question_ids %}checked{% endif %}
+        />
+        {{ question.text }}
+      </label>
+      {% endfor %}
+    </div>
+    <button class="btn btn-primary" type="submit">Save Assignment</button>
+  </form>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>Pending Descriptive Evaluations</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Result ID</th>
+          <th>Exam ID</th>
+          <th>Student ID</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in pending_results %}
+        <tr>
+          <td>{{ result.id }}</td>
+          <td>{{ result.exam_id }}</td>
+          <td>{{ result.student_id }}</td>
+          <td><a class="btn btn-primary" href="{{ url_for('examiner_evaluate_result', result_id=result.id) }}">Evaluate</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

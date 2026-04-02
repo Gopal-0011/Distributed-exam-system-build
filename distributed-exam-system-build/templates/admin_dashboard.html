@@ -1,0 +1,171 @@
+{% extends "base.html" %} {% block title %}Admin Dashboard | ExamSphere{% endblock %} {% block content %}
+<section class="dashboard-head">
+  <h1>Admin Control Center</h1>
+  <p>Manage users, schedule exams, review logs, publish final results, and trigger backups.</p>
+</section>
+
+<section class="grid-two">
+  <div class="panel">
+    <h2>Add User</h2>
+    <form method="post" action="{{ url_for('admin_add_user') }}" class="inline-form">
+      <input type="text" name="name" placeholder="Name" minlength="2" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" minlength="8" required />
+      <select name="role" required>
+        <option value="student">Student</option>
+        <option value="examiner">Examiner</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Add</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Create Exam</h2>
+    <form method="post" action="{{ url_for('admin_create_exam') }}" class="inline-form">
+      <input type="text" name="title" placeholder="Exam title" minlength="3" required />
+      <input type="date" name="date" required />
+      <input type="time" name="time" required />
+      <input type="number" name="duration_minutes" min="1" placeholder="Duration (minutes)" required />
+      <select name="examiner_id" required>
+        <option value="">Select Examiner</option>
+        {% for user in users %} {% if user.role == 'examiner' %}
+        <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+        {% endif %} {% endfor %}
+      </select>
+      <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-title-row">
+    <h2>User Management</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_update_user', user_id=user.id) }}" class="table-actions">
+              <input type="text" name="name" value="{{ user.name }}" minlength="2" required />
+              <select name="role" required>
+                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="examiner" {% if user.role == 'examiner' %}selected{% endif %}>Examiner</option>
+                <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+              </select>
+              <input type="password" name="password" placeholder="New password (optional)" minlength="8" />
+              <button class="btn btn-secondary" type="submit">Update</button>
+            </form>
+            <form method="post" action="{{ url_for('admin_delete_user', user_id=user.id) }}">
+              <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Exams</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Duration</th>
+          <th>Assigned Questions</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exam in exams %}
+        <tr>
+          <td>{{ exam.title }}</td>
+          <td>{{ exam.date }}</td>
+          <td>{{ exam.time }}</td>
+          <td>{{ exam.duration_minutes }} min</td>
+          <td>{{ exam.question_ids|length }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_delete_exam', exam_id=exam.id) }}">
+              <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Results Control</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Result ID</th>
+          <th>Status</th>
+          <th>Score</th>
+          <th>Grade</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr>
+          <td>{{ result.id }}</td>
+          <td>{{ result.status }}</td>
+          <td>{{ result.total_score }} / {{ result.total_marks }}</td>
+          <td>{{ result.grade }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_publish_result', result_id=result.id) }}">
+              <button class="btn btn-primary" type="submit">Publish</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="grid-two">
+  <div class="panel">
+    <h2>Backup</h2>
+    <p>Create an immediate snapshot of distributed JSON stores.</p>
+    <form method="post" action="{{ url_for('admin_manual_backup') }}">
+      <button class="btn btn-primary" type="submit">Create Backup Snapshot</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Recent System Logs</h2>
+    <div class="logs-list">
+      {% for log in logs %}
+      <div class="log-item">
+        <p><strong>{{ log.action }}</strong></p>
+        <p>{{ log.details }}</p>
+        <small>{{ log.timestamp }} | {{ log.ip }}</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

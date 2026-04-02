@@ -1,0 +1,7 @@
+{% extends "base.html" %} {% block title %}Error | ExamSphere{% endblock %} {% block content %}
+<section class="form-shell">
+  <h1>Something Went Wrong</h1>
+  <p>{{ message }}</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Go Home</a>
+</section>
+{% endblock %}

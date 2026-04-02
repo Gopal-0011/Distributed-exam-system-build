@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% block title %}Take Exam | ExamSphere{% endblock %} {% block content %}
+<section class="dashboard-head">
+  <h1>{{ exam.title }}</h1>
+  <p>Duration: {{ exam.duration_minutes }} minutes. The exam will auto-submit when the timer ends.</p>
+  <div class="timer" data-duration-minutes="{{ exam.duration_minutes }}">
+    Time Left: <span id="time-left">--:--</span>
+  </div>
+</section>
+
+<section class="panel">
+  <form method="post" action="{{ url_for('student_submit_exam', exam_id=exam.id) }}" id="exam-form">
+    {% for question in questions %}
+    <div class="question-block">
+      <h3>Q{{ loop.index }}. {{ question.text }} ({{ question.marks }} marks)</h3>
+
+      {% if question.type == 'mcq' %}
+      <div class="mcq-list">
+        {% for option in question.options %}
+        <label><input type="radio" name="q_{{ question.id }}" value="{{ option }}" /> {{ option }}</label>
+        {% endfor %}
+      </div>
+      {% else %}
+      <textarea name="q_{{ question.id }}" rows="4" placeholder="Write your answer here..."></textarea>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <button class="btn btn-primary" type="submit">Submit Exam</button>
+  </form>
+</section>
+
+<script>
+  const timerElement = document.querySelector(".timer");
+  const examForm = document.getElementById("exam-form");
+  const timeLeft = document.getElementById("time-left");
+  const durationMinutes = Number(timerElement?.dataset?.durationMinutes || "0");
+  let remaining = durationMinutes * 60;
+
+  const interval = setInterval(() => {
+    if (remaining <= 0) {
+      clearInterval(interval);
+      examForm.submit();
+      return;
+    }
+
+    const minutes = Math.floor(remaining / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (remaining % 60).toString().padStart(2, "0");
+    timeLeft.textContent = `${minutes}:${seconds}`;
+    remaining -= 1;
+  }, 1000);
+</script>
+{% endblock %}

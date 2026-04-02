@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block title %}Evaluate Result | ExamSphere{% endblock %} {% block content %}
+<section class="dashboard-head">
+  <h1>Evaluate Descriptive Answers</h1>
+  <p>Exam: {{ exam.title }} | Student: {{ student.name if student else result_item.student_id }}</p>
+</section>
+
+<section class="panel">
+  <form method="post" class="evaluation-form">
+    {% for question in descriptive_questions %}
+    <div class="evaluation-item">
+      <h3>{{ question.text }}</h3>
+      <p><strong>Student Answer:</strong> {{ result_item.answers.get(question.id, 'No answer') }}</p>
+      <label for="marks_{{ question.id }}">Marks (max {{ question.marks }})</label>
+      <input id="marks_{{ question.id }}" name="marks_{{ question.id }}" type="number" min="0" max="{{ question.marks }}" step="0.5" required />
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Save Evaluation</button>
+  </form>
+</section>
+{% endblock %}

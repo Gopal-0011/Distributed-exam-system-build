@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% block title %}Student Dashboard | ExamSphere{% endblock %} {% block content %}
+<section class="dashboard-head">
+  <h1>Student Exam Portal</h1>
+  <p>View available exams, attempt once with timer control, and access result history.</p>
+</section>
+
+<section class="panel">
+  <h2>Available Exams</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Schedule</th>
+          <th>Duration</th>
+          <th>Attempt</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in exam_cards %}
+        <tr>
+          <td>{{ item.exam.title }}</td>
+          <td>{{ item.exam.date }} {{ item.exam.time }}</td>
+          <td>{{ item.exam.duration_minutes }} min</td>
+          <td>
+            {% if item.can_attempt %}
+            <a class="btn btn-primary" href="{{ url_for('student_start_exam', exam_id=item.exam.id) }}">Start Exam</a>
+            {% else %}
+            <span class="tag done">Attempted</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Result History</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Result ID</th>
+          <th>Status</th>
+          <th>Score</th>
+          <th>Grade</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in history %}
+        <tr>
+          <td>{{ result.id }}</td>
+          <td>{{ result.status }}</td>
+          <td>{{ result.total_score }} / {{ result.total_marks }}</td>
+          <td>{{ result.grade }}</td>
+          <td><a class="btn btn-secondary" href="{{ url_for('student_download_result', result_id=result.id) }}">Download</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

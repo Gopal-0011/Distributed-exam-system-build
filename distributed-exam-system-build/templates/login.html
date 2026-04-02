@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %}Login | ExamSphere{% endblock %} {% block content %}
+<section class="form-shell">
+  <h1>Welcome Back</h1>
+  <p>Use your credentials or Google OAuth to continue.</p>
+
+  <form method="post" class="auth-form" novalidate>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required />
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" minlength="8" required />
+
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+
+  <div class="oauth-block">
+    <p>Google Sign-In</p>
+    <div class="oauth-actions">
+      <a class="btn btn-secondary" href="{{ url_for('google_login', role='student') }}">Google as Student</a>
+      <a class="btn btn-secondary" href="{{ url_for('google_login', role='examiner') }}">Google as Examiner</a>
+      <a class="btn btn-secondary" href="{{ url_for('google_login', role='admin') }}">Google as Admin</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

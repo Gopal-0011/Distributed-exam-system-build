@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %}ExamSphere | Distributed Exam Management{% endblock %} {% block content %}
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="eyebrow">Distributed Exam Management Platform</p>
+    <h1>ExamSphere</h1>
+    <p>
+      Role-based exam orchestration for Admins, Examiners, and Students with secure sessions,
+      JSON-driven storage, timer-based assessments, and real-time evaluation workflows.
+    </p>
+    <div class="cta-group">
+      <a class="btn btn-primary" href="{{ url_for('login') }}">Login</a>
+      <a class="btn btn-secondary" href="{{ url_for('register') }}">Create Account</a>
+    </div>
+  </div>
+</section>
+
+<section class="single-purpose-section">
+  <h2>Built For Complete Exam Lifecycle</h2>
+  <p>
+    Create exams, build question banks, conduct timed tests, auto-evaluate MCQs, manually score descriptive
+    answers, and publish results from one integrated system.
+  </p>
+</section>
+{% endblock %}
